@@ -5,7 +5,7 @@
 
 *Turning fragmented, chaotic trip planning into one intelligent, end-to-end experience.*
 
-[![Report](https://img.shields.io/badge/📄-Full%20Report-blue?style=for-the-badge)](#)
+[![Report](https://img.shields.io/badge/📄-Full%20Report-blue?style=for-the-badge)](TouRA_Doc.pdf)
 [![Presentation](https://img.shields.io/badge/🎞️-Presentation-orange?style=for-the-badge)](#)
 [![Demo](https://img.shields.io/badge/🎬-Demo%20Video-red?style=for-the-badge)](#)
 
@@ -66,7 +66,7 @@ The AI services sit alongside a modular platform I collaborated on with my team:
 - **Mobile app** — React Native + Expo, offline-first with local SQLite, real-time chat & notifications via SignalR.
 - **Admin dashboard** — React + TypeScript + Vite, Redux Toolkit/RTK Query, Leaflet.
 
-Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are available in the [full report](#).
+Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are available in the [full report](TouRA_Doc.pdf).
 
 ---
 
