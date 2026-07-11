@@ -1,82 +1,86 @@
-# TouRA — AI-Powered Smart Tourism Platform 🇪🇬
+<div align="center">
 
-TouRA is an AI-powered smart tourism platform built to solve a real problem: tourists visiting Egypt are forced to juggle 3–4 disconnected apps to plan a single outing — one for ideas, one for maps, one for reviews, and separate, often untrustworthy channels for guides and transportation. TouRA unifies theme-based trip planning, a guide bidding marketplace, real-time map visualization, ratings/reviews, and two custom-built AI microservices into a single mobile experience.
+# 🏛️ TouRA
+### AI-Powered Smart Tourism Platform for Egypt
 
-This was my Graduation Project at the Faculty of Computers and Artificial Intelligence, Cairo University (Information Systems Department, June 2026).
+*Turning fragmented, chaotic trip planning into one intelligent, end-to-end experience.*
 
-> 📄 **Full Report:** [link to documentation]
-> 🎞️ **Presentation Slides:** [link to presentation]
-> 🎬 **Demo Video:** [link to demo video]
+[![Report](https://img.shields.io/badge/📄-Full%20Report-blue?style=for-the-badge)](#)
+[![Presentation](https://img.shields.io/badge/🎞️-Presentation-orange?style=for-the-badge)](#)
+[![Demo](https://img.shields.io/badge/🎬-Demo%20Video-red?style=for-the-badge)](#)
 
----
+Graduation Project · Faculty of Computers and Artificial Intelligence, Cairo University · June 2026
 
-## 📌 Project Overview
-
-TouRA lets a user pick a theme (romantic, family, friends, solo), a location, and a budget, and generates a complete, organized outing plan — instead of relying on generic popularity-based recommendations. On top of planning, TouRA layers:
-
-- **Theme-based AI trip generation** with a live interactive map
-- **A guide marketplace** where verified local guides bid on trips (InDrive-style)
-- **Group trips**, live guide location sharing, and real-time chat via SignalR
-- **Ratings & reviews** for guides and places
-- **Two AI microservices** that are the technical core of the project (detailed below)
-
-The backend is a modular .NET system (Users, Trips, Conversations, Notifications, Payments) built with Clean Architecture, a Transactional Outbox/Inbox for reliable inter-module messaging, and a database-per-module design. The mobile app is React Native + Expo, and the admin dashboard is React + TypeScript. These are covered briefly here — the focus of this README, and of my personal contribution to the project, is the **AI layer**.
+</div>
 
 ---
 
-## 🤖 The AI Features (My Focus)
+## ✨ Overview
 
-TouRA's AI capabilities are built as two independent Python microservices, decoupled from the core .NET backend and accessed through thin HTTP clients. This let us iterate on the AI stack freely without touching the rest of the system, and swap in mock services during local development and testing.
+Planning a trip to Egypt today means juggling three or four disconnected apps — one for ideas, one for maps, one for reviews, and a separate, often unreliable channel just to find a guide. **TouRA** replaces that chaos with a single platform: users pick a **theme** (romantic, family, friends, solo), a location, and a budget, and get back a fully organized, AI-generated plan on an interactive map — with the ability to bid-hire a verified local guide, chat in real time, and rate everything afterward.
 
-### 1. Statue Storyteller — AI Monument Recognition & Narration
+Beyond the planning layer, TouRA's signature feature is turning a **silent museum visit into an interactive one**: point a phone at a statue, and an AI agent identifies it and tells its story.
 
-The Statue Storyteller lets a tourist snap a photo of a statue or monument and get an accurate, conversational historical narrative back — turning a silent museum visit into an interactive one.
+This README focuses on the part of the system I personally designed and built — **the two AI microservices** — while briefly covering the rest of the platform for context.
 
-**How it works:**
-- **Custom image dataset** — since no reliable open dataset of Egyptian artifacts exists, I built one from scratch: 75 distinct monuments/statues, each with a minimum of 15 verified images (1,100+ images total), sourced from museum digital collections, archaeological databases, and tourism photography, then quality-filtered and augmented (brightness/contrast/color adjustments) to simulate real-world museum lighting conditions.
-- **Visual understanding** — I evaluated CNN embeddings (ResNet-50), smaller CLIP variants, and custom Siamese networks before selecting **CLIP-ViT-L-14**, which projects both images and text into a shared semantic space rather than doing closed-set classification. On a 150-image validation set it hit **~87% top-1** and **~96% top-3** retrieval accuracy, clearly outperforming the alternatives (ResNet-50 ~62%, CLIP-ViT-B/32 ~78%).
-- **Fallback recognition** — when an artifact isn't confidently matched in our own dataset, the agent falls back to a **Google Lens reverse-image search** tool.
-- **Conversational agent** — built with **LangGraph** as a compiled `StateGraph`: a single model node (served via the **Groq SDK**, LLaMA) is bound to the Google Lens tool and decides mid-turn whether to call it or answer directly. Rather than keeping state in memory, every turn is rebuilt from PostgreSQL: the last 3 messages are loaded, converted into typed `HumanMessage`/`AIMessage` objects, and replayed through the graph — which keeps the service stateless and horizontally scalable.
-- **Stack:** FastAPI, SQLAlchemy 2.x + psycopg3, LangGraph, Groq SDK, OpenRouter, DINOv2, Google Lens API, deployed on Azure Container Apps with an Azure-managed PostgreSQL instance.
+---
 
-### 2. AI Travel Planner — Multi-Agent Itinerary Generation
+## 🤖 The AI Features — My Core Contribution
 
-The AI Travel Planner generates realistic, personalized multi-day itineraries from a theme, destination, dates, and a candidate list of places — instead of the generic, popularity-ranked lists most competitors return.
+TouRA's intelligence is delivered through two independent Python microservices, fully decoupled from the core backend and reached through thin HTTP clients. This isolation let me iterate on the AI stack freely and swap in mocks during development, without the rest of the system ever needing to know what was happening underneath.
 
-**How it works:**
-- **Multi-agent pipeline with CrewAI** — an **Events Discovery crew** (LLaMA-3.3-70B via Groq) searches the web through a Tavily tool for real, date-relevant concerts, festivals, and exhibitions, and produces a structured `EventsReport`. Its output feeds an **Itinerary Planner crew** (GPT-4o-mini via OpenRouter), which schedules attractions across days — grouping geographically close places together, minimizing backtracking, and keeping each day's schedule to a realistic 6–9 hours.
-- **Realistic travel-time correction** — after the draft itinerary is produced, actual road travel times are pulled from **OSRM** to recalculate start/end times between stops; if OSRM is slow or unavailable, the service transparently falls back to a **Haversine-distance estimate** (assuming ~30 km/h average driving speed) so the pipeline never blocks on a routing failure.
-- **Robust structured output** — results are validated against a Pydantic `TravelItinerary` schema, with a manual validation pass as a fallback for the cases where CrewAI's automatic structured parsing fails on an otherwise valid LLM response.
-- **Stack:** FastAPI, Pydantic v2, CrewAI, Groq SDK, OpenRouter, Tavily, OSRM, deployed as a Docker container on Hugging Face Spaces.
+### 🗿 Statue Storyteller — AI Monument Recognition & Narration
 
-### Why this design
+A tourist photographs a statue or monument; the system identifies it and responds with an accurate, conversational historical narrative.
 
-Both services deliberately avoid hard dependence on any single paid vendor: LLM calls are split across Groq and OpenRouter, routing has a free-tier OSRM path with a pure-math fallback, and recognition has a dataset-first approach with an external-search fallback. This kept the AI stack fully functional on a $0 student budget while staying architecturally ready to swap in production-grade providers later (see the report's Future Work section).
+| Component | Details |
+|---|---|
+| **Dataset** | Built from scratch — no reliable open dataset of Egyptian artifacts exists. 75 distinct monuments, 15+ verified images each (1,100+ images), sourced from museum collections and archaeological archives, then quality-filtered and augmented for realistic lighting variation. |
+| **Visual model** | Evaluated ResNet-50, CLIP-ViT-B/32, and custom Siamese networks before selecting **CLIP-ViT-L-14** — chosen because it embeds images *and* text into a shared semantic space instead of doing closed-set classification. Result: **~87% top-1 / ~96% top-3** retrieval accuracy on a 150-image validation set, versus ~78% (smaller CLIP) and ~62% (ResNet-50). |
+| **Fallback recognition** | When the in-house dataset can't confidently match an artifact, the agent calls a **Google Lens reverse-image search** tool instead. |
+| **Conversational engine** | A compiled **LangGraph** `StateGraph`: one model node (served by the **Groq SDK**, LLaMA) bound to the Google Lens tool, deciding mid-turn whether to call it or answer directly. The service is fully **stateless** — every turn is reconstructed from PostgreSQL (last 3 messages → typed message objects → replayed through the graph), making it easy to scale horizontally. |
+| **Stack** | FastAPI · SQLAlchemy 2.x + psycopg3 · LangGraph · Groq SDK · OpenRouter · DINOv2 · Google Lens API · Azure Container Apps · Azure PostgreSQL |
+
+### 🗺️ AI Travel Planner — Multi-Agent Itinerary Generation
+
+Generates realistic, personalized multi-day itineraries from a theme, destination, dates, and candidate places — instead of the generic, popularity-ranked lists competitors return.
+
+| Component | Details |
+|---|---|
+| **Multi-agent pipeline** | Built with **CrewAI**. An **Events Discovery crew** (LLaMA-3.3-70B via Groq) uses a Tavily web-search tool to find real, date-relevant concerts, festivals, and exhibitions. Its output feeds an **Itinerary Planner crew** (GPT-4o-mini via OpenRouter), which schedules attractions per day — grouping nearby places together, minimizing backtracking, and keeping each day to a realistic 6–9 hours. |
+| **Realistic travel times** | After the draft itinerary is built, real road travel times are pulled from **OSRM** to recompute stop timings. If OSRM is slow or down, the service silently falls back to a **Haversine-distance estimate** (~30 km/h average), so routing failures never block a response. |
+| **Reliable structured output** | Results are validated against a Pydantic `TravelItinerary` schema, with a manual validation fallback for the rare cases where CrewAI's automatic parsing fails on an otherwise valid model response. |
+| **Stack** | FastAPI · Pydantic v2 · CrewAI · Groq SDK · OpenRouter · Tavily · OSRM · Docker on Hugging Face Spaces |
+
+### 💡 Design Philosophy
+
+Both services avoid hard dependence on any single paid vendor: LLM calls are split across Groq and OpenRouter, routing has a free-tier path with a pure-math fallback, and recognition pairs an in-house dataset with an external-search fallback. This kept the entire AI stack running on a **$0 student budget** while staying architecturally ready to plug in production-grade providers later.
 
 ---
 
 ## 🧱 System Architecture (Brief)
 
-- **Backend:** Modular .NET (Clean Architecture) — Users, Trips, Conversations, Notifications, Payments modules, communicating through versioned Contracts and a Transactional Outbox/Inbox for reliable messaging.
-- **Mobile app:** React Native + Expo, offline-first with local SQLite, real-time chat/notifications via SignalR.
-- **Admin dashboard:** React + TypeScript + Vite, Redux Toolkit/RTK Query, Leaflet for maps.
-- **AI microservices:** Statue Storyteller & AI Travel Planner (see above) — the two components I designed, built, and evaluated.
+The AI services sit alongside a modular platform I collaborated on with my team:
 
-Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are in the report linked above.
+- **Backend** — Modular .NET (Clean Architecture): Users, Trips, Conversations, Notifications, Payments — communicating through versioned contracts and a Transactional Outbox/Inbox for reliable messaging.
+- **Mobile app** — React Native + Expo, offline-first with local SQLite, real-time chat & notifications via SignalR.
+- **Admin dashboard** — React + TypeScript + Vite, Redux Toolkit/RTK Query, Leaflet.
+
+Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are available in the [full report](#).
 
 ---
 
-## 🛠️ Tech Stack Summary
+## 🛠️ Tech Stack
 
-| Layer | Technologies |
-|---|---|
-| AI — Recognition | CLIP-ViT-L-14, DINOv2, Google Lens, LangGraph, Groq (LLaMA) |
-| AI — Trip Planning | CrewAI, Groq (LLaMA-3.3-70B), OpenRouter (GPT-4o-mini), Tavily, OSRM |
-| AI Services Backend | FastAPI, SQLAlchemy 2.x, Pydantic v2 |
-| Core Backend | ASP.NET Core, EF Core, SignalR, Clean Architecture |
-| Mobile | React Native, Expo, Expo Router, React Query, Zustand, SQLite |
-| Admin Dashboard | React, TypeScript, Vite, Redux Toolkit, Leaflet |
-| Infra | Docker, Azure Container Apps, Azure PostgreSQL, Hugging Face Spaces, MinIO |
+<table>
+<tr><td><b>AI — Recognition</b></td><td>CLIP-ViT-L-14 · DINOv2 · Google Lens · LangGraph · Groq (LLaMA)</td></tr>
+<tr><td><b>AI — Trip Planning</b></td><td>CrewAI · Groq (LLaMA-3.3-70B) · OpenRouter (GPT-4o-mini) · Tavily · OSRM</td></tr>
+<tr><td><b>AI Services Backend</b></td><td>FastAPI · SQLAlchemy 2.x · Pydantic v2</td></tr>
+<tr><td><b>Core Backend</b></td><td>ASP.NET Core · EF Core · SignalR · Clean Architecture</td></tr>
+<tr><td><b>Mobile</b></td><td>React Native · Expo · Expo Router · React Query · Zustand · SQLite</td></tr>
+<tr><td><b>Admin Dashboard</b></td><td>React · TypeScript · Vite · Redux Toolkit · Leaflet</td></tr>
+<tr><td><b>Infrastructure</b></td><td>Docker · Azure Container Apps · Azure PostgreSQL · Hugging Face Spaces · MinIO</td></tr>
+</table>
 
 ---
 
@@ -84,12 +88,13 @@ Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are in the re
 
 Alaa Wael Mohamed · Yussuf Mohammad Taha · Omar Osama Hassan · Anas Abdelnasser Ibrahim · Mohammad Rabea · Hager Hassan
 
-Under the supervision of Dr. Ibrahim Gomaa, Dr. Asmaa Ahmed, and TA. Nehal Akram — Faculty of Computers and Artificial Intelligence, Cairo University.
+**Supervised by:** Dr. Ibrahim Gomaa · Dr. Asmaa Ahmed · TA. Nehal Akram
+Faculty of Computers and Artificial Intelligence, Cairo University
 
 ---
 
-## 📎 Links
+<div align="center">
 
-- 📄 Full Report: [add link]
-- 🎞️ Presentation: [add link]
-- 🎬 Demo Video: [add link]
+📄 [Full Report](#) &nbsp;·&nbsp; 🎞️ [Presentation](#) &nbsp;·&nbsp; 🎬 [Demo Video](#)
+
+</div>
