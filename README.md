@@ -7,7 +7,7 @@
 
 [![Report](https://img.shields.io/badge/📄-Full%20Report-blue?style=for-the-badge)](TouRA_Doc.pdf)
 [![Presentation](https://img.shields.io/badge/🎞️-Presentation-orange?style=for-the-badge)](TouRA_Presentation.pptx)
-[![Demo](https://img.shields.io/badge/🎬-Demo%20Video-red?style=for-the-badge)](#)
+[![Demo](https://img.shields.io/badge/🎬-Demo%20Video-red?style=for-the-badge)](https://drive.google.com/file/d/1jTLGpXoczCzdf-34WSgU9ofApf4PSl4d/view?usp=drive_link)
 
 Graduation Project · Faculty of Computers and Artificial Intelligence, Cairo University · June 2026
 
@@ -95,6 +95,6 @@ Faculty of Computers and Artificial Intelligence, Cairo University
 
 <div align="center">
 
-📄 [Full Report](TouRA_Doc.pdf) &nbsp;·&nbsp; 🎞️ [Presentation](TouRA_Presentation.pptx) &nbsp;·&nbsp; 🎬 [Demo Video](#)
+📄 [Full Report](TouRA_Doc.pdf) &nbsp;·&nbsp; 🎞️ [Presentation](TouRA_Presentation.pptx) &nbsp;·&nbsp; 🎬 [Demo Video](https://drive.google.com/file/d/1jTLGpXoczCzdf-34WSgU9ofApf4PSl4d/view?usp=drive_link)
 
 </div>
