@@ -95,6 +95,6 @@ Faculty of Computers and Artificial Intelligence, Cairo University
 
 <div align="center">
 
-📄 [Full Report](#) &nbsp;·&nbsp; 🎞️ [Presentation](#) &nbsp;·&nbsp; 🎬 [Demo Video](#)
+📄 [Full Report](TouRA_Doc.pdf) &nbsp;·&nbsp; 🎞️ [Presentation](#) &nbsp;·&nbsp; 🎬 [Demo Video](#)
 
 </div>
