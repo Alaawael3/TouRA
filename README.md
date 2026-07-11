@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🏛️ TouRA
+# TouRA
 ### AI-Powered Smart Tourism Platform for Egypt
 
 *Turning fragmented, chaotic trip planning into one intelligent, end-to-end experience.*
 
 [![Report](https://img.shields.io/badge/📄-Full%20Report-blue?style=for-the-badge)](TouRA_Doc.pdf)
-[![Presentation](https://img.shields.io/badge/🎞️-Presentation-orange?style=for-the-badge)](#)
+[![Presentation](https://img.shields.io/badge/🎞️-Presentation-orange?style=for-the-badge)](TouRA_Presentation.pptx)
 [![Demo](https://img.shields.io/badge/🎬-Demo%20Video-red?style=for-the-badge)](#)
 
 Graduation Project · Faculty of Computers and Artificial Intelligence, Cairo University · June 2026
@@ -15,7 +15,7 @@ Graduation Project · Faculty of Computers and Artificial Intelligence, Cairo Un
 
 ---
 
-## ✨ Overview
+## Overview
 
 Planning a trip to Egypt today means juggling three or four disconnected apps — one for ideas, one for maps, one for reviews, and a separate, often unreliable channel just to find a guide. **TouRA** replaces that chaos with a single platform: users pick a **theme** (romantic, family, friends, solo), a location, and a budget, and get back a fully organized, AI-generated plan on an interactive map — with the ability to bid-hire a verified local guide, chat in real time, and rate everything afterward.
 
@@ -25,7 +25,7 @@ This README focuses on the part of the system I personally designed and built �
 
 ---
 
-## 🤖 The AI Features — My Core Contribution
+## The AI Features — My Core Contribution
 
 TouRA's intelligence is delivered through two independent Python microservices, fully decoupled from the core backend and reached through thin HTTP clients. This isolation let me iterate on the AI stack freely and swap in mocks during development, without the rest of the system ever needing to know what was happening underneath.
 
@@ -41,7 +41,7 @@ A tourist photographs a statue or monument; the system identifies it and respond
 | **Conversational engine** | A compiled **LangGraph** `StateGraph`: one model node (served by the **Groq SDK**, LLaMA) bound to the Google Lens tool, deciding mid-turn whether to call it or answer directly. The service is fully **stateless** — every turn is reconstructed from PostgreSQL (last 3 messages → typed message objects → replayed through the graph), making it easy to scale horizontally. |
 | **Stack** | FastAPI · SQLAlchemy 2.x + psycopg3 · LangGraph · Groq SDK · OpenRouter · DINOv2 · Google Lens API · Azure Container Apps · Azure PostgreSQL |
 
-### 🗺️ AI Travel Planner — Multi-Agent Itinerary Generation
+### AI Travel Planner — Multi-Agent Itinerary Generation
 
 Generates realistic, personalized multi-day itineraries from a theme, destination, dates, and candidate places — instead of the generic, popularity-ranked lists competitors return.
 
@@ -52,13 +52,13 @@ Generates realistic, personalized multi-day itineraries from a theme, destinatio
 | **Reliable structured output** | Results are validated against a Pydantic `TravelItinerary` schema, with a manual validation fallback for the rare cases where CrewAI's automatic parsing fails on an otherwise valid model response. |
 | **Stack** | FastAPI · Pydantic v2 · CrewAI · Groq SDK · OpenRouter · Tavily · OSRM · Docker on Hugging Face Spaces |
 
-### 💡 Design Philosophy
+### Design Philosophy
 
 Both services avoid hard dependence on any single paid vendor: LLM calls are split across Groq and OpenRouter, routing has a free-tier path with a pure-math fallback, and recognition pairs an in-house dataset with an external-search fallback. This kept the entire AI stack running on a **$0 student budget** while staying architecturally ready to plug in production-grade providers later.
 
 ---
 
-## 🧱 System Architecture (Brief)
+## System Architecture (Brief)
 
 The AI services sit alongside a modular platform I collaborated on with my team:
 
@@ -70,7 +70,7 @@ Full diagrams (Use Case, ERD, UML, Sequence, Backend Architecture) are available
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 <table>
 <tr><td><b>AI — Recognition</b></td><td>CLIP-ViT-L-14 · DINOv2 · Google Lens · LangGraph · Groq (LLaMA)</td></tr>
@@ -95,6 +95,6 @@ Faculty of Computers and Artificial Intelligence, Cairo University
 
 <div align="center">
 
-📄 [Full Report](TouRA_Doc.pdf) &nbsp;·&nbsp; 🎞️ [Presentation](#) &nbsp;·&nbsp; 🎬 [Demo Video](#)
+📄 [Full Report](TouRA_Doc.pdf) &nbsp;·&nbsp; 🎞️ [Presentation](TouRA_Presentation.pptx) &nbsp;·&nbsp; 🎬 [Demo Video](#)
 
 </div>
